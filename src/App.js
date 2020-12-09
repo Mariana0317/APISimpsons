@@ -1,25 +1,54 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment, useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import Frase from "./componentes/Frase";
+import Spinner from "./componentes/Spinner";
 
 function App() {
+  const [fraseSimpsons, setFraseSimpsons] = useState({});
+  const [loader, setLoader] = useState(false);
+  useEffect(() => {
+    consultarAPI();
+  }, []);
+
+  const consultarAPI = async () => {
+    setLoader(true);
+    const api = await fetch("https://thesimpsonsquoteapi.glitch.me/quotes");
+    const resp = await api.json();
+    console.log(api);
+    console.log(resp[0]);
+
+    setTimeout(() => {
+      setFraseSimpsons(resp[0]);
+      setLoader(false);
+    }, 2000);
+  };
+
+  const cargarLoader = loader ? (
+    <Spinner></Spinner>
+  ) : (
+    <Frase fraseSi={fraseSimpsons}></Frase>
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <section className="container text-center my-5">
+        <article className="d-flex flex-column align-items-center">
+          <img
+            src={process.env.PUBLIC_URL + "/logo.png"}
+            className="logo w-75"
+          ></img>
+          <button
+            type="button"
+            className="btn  w-50 my-5 boton"
+            onClick={() => consultarAPI()}
+          >
+            Obtener frase
+          </button>
+        </article>
+        {cargarLoader}
+      </section>
+    </Fragment>
   );
 }
 
